@@ -366,8 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ===== Formulário de reservas (Email via Web3Forms + WhatsApp) ===== */
-    // CONFIG — substituir pela Access Key obtida em https://web3forms.com
-    const WEB3FORMS_KEY = '0f4975a5-0cd9-487e-bc16-627c80846a5c';
+    // CONFIG — FormSubmit.co (grátis, ilimitado). Email de destino das reservas.
+    const FORMSUBMIT_EMAIL = 'vndesign.work@gmail.com';
     const WHATSAPP_NUMBER = '351935136629'; // número de WhatsApp (com indicativo, sem +)
 
     const form = document.getElementById('reserveForm');
@@ -399,26 +399,21 @@ document.addEventListener('DOMContentLoaded', () => {
         setStatus('', '');
         if (!validate()) { setStatus('err', 'Por favor preencha os campos obrigatórios (*).'); return; }
 
-        if (WEB3FORMS_KEY.indexOf('COLAR') === 0) {
-            setStatus('err', 'O envio por email ainda não foi ativado. Use o botão do WhatsApp abaixo.');
-            return;
-        }
-
         const submitBtn = form.querySelector('button[type="submit"]');
         const label = submitBtn.textContent;
         submitBtn.disabled = true; submitBtn.textContent = 'A enviar…';
 
         const data = new FormData(form);
-        data.append('access_key', WEB3FORMS_KEY);
-        data.append('subject', 'Nova reserva — Portal da Ribeirada');
-        data.append('from_name', 'Site Portal da Ribeirada');
+        data.append('_subject', 'Nova reserva — Portal da Ribeirada');
+        data.append('_template', 'table');
+        data.append('_captcha', 'false');
 
         try {
-            const res = await fetch('https://api.web3forms.com/submit', {
+            const res = await fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, {
                 method: 'POST', headers: { Accept: 'application/json' }, body: data
             });
             const json = await res.json();
-            if (json.success) {
+            if (json.success === true || json.success === 'true') {
                 const nome = val('nome').split(' ')[0];
                 setStatus('ok', `Obrigado, ${nome}! Pedido de reserva enviado — entraremos em contacto para confirmar.`);
                 form.reset(); resetDateMin();
