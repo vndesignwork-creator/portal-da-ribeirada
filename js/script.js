@@ -366,8 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ===== Formulário de reservas (Email via Web3Forms + WhatsApp) ===== */
-    // CONFIG — FormSubmit.co (grátis, ilimitado). Email de destino das reservas.
-    const FORMSUBMIT_EMAIL = 'vndesign.work@gmail.com';
+    // CONFIG — FormSubmit.co (grátis, ilimitado). Token esconde o email de destino.
+    const FORMSUBMIT_ID = '1c1d0175a4872c5f5e551d0d6cc2d4ac';
     const WHATSAPP_NUMBER = '351935136629'; // número de WhatsApp (com indicativo, sem +)
 
     const form = document.getElementById('reserveForm');
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.append('_captcha', 'false');
 
         try {
-            const res = await fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, {
+            const res = await fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_ID}`, {
                 method: 'POST', headers: { Accept: 'application/json' }, body: data
             });
             const json = await res.json();
