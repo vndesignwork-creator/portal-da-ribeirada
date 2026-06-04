@@ -30,7 +30,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+html { scroll-behavior: smooth; scroll-padding-top: 90px; overflow-x: hidden; }
 
 body {
     font-family: var(--font-body);
@@ -468,6 +468,9 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 700; line-height: 1
     .footer__grid { grid-template-columns: 1fr; }
     .footer__bottom-inner { flex-direction: column; text-align: center; }
     .hero__actions .btn { flex: 1; justify-content: center; }
+    /* Botoes longos (ex: descarregar ementa) podem quebrar para nao transbordar */
+    .btn { max-width: 100%; }
+    .menu__note .btn { white-space: normal; text-align: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
