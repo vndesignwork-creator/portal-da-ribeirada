@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ===== Formulário de reservas (Email via Web3Forms + WhatsApp) ===== */
     // CONFIG — substituir pela Access Key obtida em https://web3forms.com
-    const WEB3FORMS_KEY = 'COLAR_AQUI_A_ACCESS_KEY';
+    const WEB3FORMS_KEY = '0f4975a5-0cd9-487e-bc16-627c80846a5c';
     const WHATSAPP_NUMBER = '351935136629'; // número de WhatsApp (com indicativo, sem +)
 
     const form = document.getElementById('reserveForm');
