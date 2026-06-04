@@ -365,41 +365,93 @@ document.addEventListener('DOMContentLoaded', () => {
         sections.forEach(s => spy.observe(s));
     }
 
-    /* ===== Formulário de reservas ===== */
+    /* ===== Formulário de reservas (Email via Web3Forms + WhatsApp) ===== */
+    // CONFIG — substituir pela Access Key obtida em https://web3forms.com
+    const WEB3FORMS_KEY = 'COLAR_AQUI_A_ACCESS_KEY';
+    const WHATSAPP_NUMBER = '351935136629'; // número de WhatsApp (com indicativo, sem +)
+
     const form = document.getElementById('reserveForm');
     const status = document.getElementById('reserveStatus');
-
-    // Impede datas passadas
     const dateInput = document.getElementById('r-data');
-    dateInput.min = new Date().toISOString().split('T')[0];
+    const waBtn = document.getElementById('reserveWhats');
 
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        status.className = 'reserve__form-note';
-        status.textContent = '';
+    const resetDateMin = () => { dateInput.min = new Date().toISOString().split('T')[0]; };
+    resetDateMin(); // impede datas passadas
 
-        const required = form.querySelectorAll('[required]');
-        let valid = true;
-        required.forEach(field => {
-            const ok = field.value.trim() !== '';
-            field.classList.toggle('invalid', !ok);
-            if (!ok) valid = false;
+    const val = n => (form.elements[n] ? form.elements[n].value.trim() : '');
+    const setStatus = (type, msg) => {
+        status.className = 'reserve__form-note' + (type ? ' ' + type : '');
+        status.textContent = msg;
+    };
+    const validate = () => {
+        let ok = true;
+        form.querySelectorAll('[required]').forEach(f => {
+            const good = f.value.trim() !== '';
+            f.classList.toggle('invalid', !good);
+            if (!good) ok = false;
         });
+        return ok;
+    };
 
-        if (!valid) {
-            status.classList.add('err');
-            status.textContent = 'Por favor preencha os campos obrigatórios (*).';
+    /* --- Enviar por EMAIL (Web3Forms) --- */
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        setStatus('', '');
+        if (!validate()) { setStatus('err', 'Por favor preencha os campos obrigatórios (*).'); return; }
+
+        if (WEB3FORMS_KEY.indexOf('COLAR') === 0) {
+            setStatus('err', 'O envio por email ainda não foi ativado. Use o botão do WhatsApp abaixo.');
             return;
         }
 
-        const nome = form.nome.value.trim().split(' ')[0];
-        status.classList.add('ok');
-        status.textContent = `Obrigado, ${nome}! Pedido de reserva recebido — entraremos em contacto para confirmar.`;
-        form.reset();
-        dateInput.min = new Date().toISOString().split('T')[0];
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const label = submitBtn.textContent;
+        submitBtn.disabled = true; submitBtn.textContent = 'A enviar…';
+
+        const data = new FormData(form);
+        data.append('access_key', WEB3FORMS_KEY);
+        data.append('subject', 'Nova reserva — Portal da Ribeirada');
+        data.append('from_name', 'Site Portal da Ribeirada');
+
+        try {
+            const res = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST', headers: { Accept: 'application/json' }, body: data
+            });
+            const json = await res.json();
+            if (json.success) {
+                const nome = val('nome').split(' ')[0];
+                setStatus('ok', `Obrigado, ${nome}! Pedido de reserva enviado — entraremos em contacto para confirmar.`);
+                form.reset(); resetDateMin();
+            } else {
+                setStatus('err', 'Não foi possível enviar. Tente novamente ou use o WhatsApp.');
+            }
+        } catch (err) {
+            setStatus('err', 'Erro de ligação. Tente novamente ou use o WhatsApp.');
+        } finally {
+            submitBtn.disabled = false; submitBtn.textContent = label;
+        }
     });
 
-    form.querySelectorAll('input, select').forEach(f => {
+    /* --- Enviar por WHATSAPP --- */
+    if (waBtn) waBtn.addEventListener('click', () => {
+        setStatus('', '');
+        if (!validate()) { setStatus('err', 'Por favor preencha os campos obrigatórios (*).'); return; }
+        const linhas = [
+            'Olá! Gostaria de fazer uma reserva no Portal da Ribeirada:',
+            '',
+            `Nome: ${val('nome')}`,
+            `Telefone: ${val('telefone')}`,
+            val('email') ? `Email: ${val('email')}` : null,
+            `Data: ${val('data')}`,
+            `Hora: ${val('hora')}`,
+            `Pessoas: ${val('pessoas')}`,
+            val('mensagem') ? `Observações: ${val('mensagem')}` : null
+        ].filter(Boolean).join('\n');
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(linhas)}`, '_blank', 'noopener');
+        setStatus('ok', 'A abrir o WhatsApp com a sua reserva… carregue em enviar para concluir.');
+    });
+
+    form.querySelectorAll('input, select, textarea').forEach(f => {
         f.addEventListener('input', () => f.classList.remove('invalid'));
     });
 });

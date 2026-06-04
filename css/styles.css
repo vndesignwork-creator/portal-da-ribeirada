@@ -346,6 +346,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 700; line-height: 1
 .field textarea { resize: vertical; }
 .field input.invalid, .field select.invalid { border-color: #c0392b; background: #fdf3f2; }
 .reserve__form .btn { margin-top: .5rem; }
+.reserve__wa { margin-top: .7rem; }
 .reserve__form-note { margin-top: 1rem; font-size: .9rem; text-align: center; min-height: 1.2em; }
 .reserve__form-note.ok { color: #1e7a46; font-weight: 600; }
 .reserve__form-note.err { color: #c0392b; font-weight: 600; }
