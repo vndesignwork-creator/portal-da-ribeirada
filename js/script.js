@@ -237,6 +237,17 @@ document.addEventListener('DOMContentLoaded', () => {
     nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
 
+    /* ===== Logo e "Início" → topo absoluto (mostra a topbar, não fica oculto) ===== */
+    /* (exclui o skip-link, que mantém o salto+foco para acessibilidade) */
+    document.querySelectorAll('.brand, a.nav__link[href="#inicio"]').forEach(a => {
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeNav();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            history.replaceState(null, '', location.pathname + location.search);
+        });
+    });
+
     /* ===== Header com sombra ao scroll ===== */
     const header = document.getElementById('header');
     const onScroll = () => {
