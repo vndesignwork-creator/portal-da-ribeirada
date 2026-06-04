@@ -1,0 +1,13 @@
+# Ferramentas locais / preview
+.claude/
+
+# Dependências
+node_modules/
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs
+*.log
